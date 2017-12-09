@@ -9,10 +9,12 @@
 				var vm=new Vue({
 					el:"#box",
 					data:{
-						
+						kk:"点击"
 					},
 					methods:{
-						
+						kfc:function(){
+							//this.kk=""
+						}
 					}
 				})
 			}
@@ -20,7 +22,8 @@
 	</head>
 	<body>
 		<div  id="box">
-			<input type="button" :value="kk" @click="kfc">
+			<input type="text" v-model="kk" />
+			<input type="button" v-model="kk" @click="kfc">
 		</div>
 		
 	</body>
