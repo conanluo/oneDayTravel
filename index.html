@@ -3,28 +3,112 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>一日游</title>
+		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css"/>
 		<script src="bower_components/vue/dist/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
 			window.onload=function(){
 				var vm=new Vue({
-					el:"#box",
+					el:"",
 					data:{
-						kk:"点击"
+						
 					},
 					methods:{
-						kfc:function(){
-							//this.kk=""
-						}
+						
 					}
 				})
 			}
 		</script>
 	</head>
 	<body>
-		<div  id="box">
-			<input type="text" v-model="kk" />
-			<input type="button" v-model="kk" @click="kfc">
-		</div>
+		<p id="demo">点击按钮获取您当前坐标（可能需要比较长的时间获取）：</p>
+		<p id="addressJson"></p>
+		<p id="ad"></p>
+		<button onclick="getLocation()">点我</button>
+		<!--<button onclick="getxxx()">没事别点我</button>-->
 		
 	</body>
 </html>
+<script>
+	//var murl="http://maps.google.com/maps/api/geocode/json?sensor=true&latlng="
+	//var murl="https://maps.google.com/maps/api/geocode/json?sensor=false&latlng="
+	
+	var murl = "http://conanluo.net/travel/"
+	//var murl = "http://127.0.0.1:8888/"	
+	
+	wei=22.579987750483506
+	jing=113.09111077810719
+	
+	function getxxx(w,j){
+	/*	
+		$.getJSON(murl+("?wei="+wei+"&jing="+jing+"&format=3"), function(data){
+				alert(data)
+				alert(data)
+		});
+	*/
+		$.ajax({  
+            type: "get", //jsonp默认为get请求，即使写post也会转换成get方式  
+            async: false, // jsonp默认为false，即使写true也会转换成false  
+            url: murl+("?wei="+w+"&jing="+j+"&format=City"), // 服务端地址  
+            //data: {"code" : "CA1405"}, // 入参  
+            //data:{"wei":w,"jing":j,"format":"City"}
+            dataType: "jsonp", // jsonp调用固定写法  
+            jsonp: "callback", // 传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(一般默认为:callback)。即：?callback=xxx中的callback部分  
+            //jsonpCallback:"gg",//自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名，也可以写"?"，jQuery会自动为你处理数据。即：?callback=xxx中的xxx部分  
+            success: function(data){ // 调用成功之后的方法  
+				//$("#demo").hide()
+				if(data.status=="Success"){
+					$("#ad").text(data.result)
+				}else{
+					$("#ad").text("出错了,出错代号是"+data.status)
+				}
+           	},  
+            error: function(){ // 调用失败之后的方法 
+				//$("#demo").hide() 
+                $("#ad").text(murl+("?wei="+wei+"&jing="+jing+"&format=3"));  
+            }  
+        });  
+	}
+	
+	
+	
+	function getLocation() {
+		$("#demo").text("Checking your location....")
+		if(navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(showPosition, showError);
+			//navigator.geolocation.getCurrentPosition(showPosition, showPosition);
+		} else {
+			$("#x").text( "该浏览器不支持定位。");
+		}
+	}
+
+	function showPosition(position) {
+		//$("#x").text( "纬度: " + position.coords.latitude +	"<br>经度: " + position.coords.longitude+"<br>")
+			//+murl+ position.coords.latitude+","+ position.coords.longitude;
+		wei=position.coords.latitude
+		jing=position.coords.longitude
+		$("#demo").text(wei+"-"+jing)
+		//http://conanluo.net/travel/?wei=37.745087750483506&jing=-122.50371077810719&format=3
+		//http://conanluo.net/travel/?wei=37.745087750483506&jing=122.50371077810719&format=3
+		getxxx(wei,jing)
+		
+	}
+
+	function showError(error) {
+		switch(error.code) {
+			case error.PERMISSION_DENIED:
+				$("#x").text( "用户拒绝对获取地理位置的请求。")
+				break;
+			case error.POSITION_UNAVAILABLE:
+				$("#x").text( "位置信息是不可用的。")
+				break;
+			case error.TIMEOUT:
+				$("#x").text( "请求用户地理位置超时。")
+				break;
+			case error.UNKNOWN_ERROR:
+				$("#x").text( "未知错误。")
+				break;
+		}
+	}
+</script>
